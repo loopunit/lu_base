@@ -25,6 +25,8 @@ option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
 include(cmake/CPM.cmake)
 
 find_package(CrossWindow MODULE REQUIRED)
+find_package(DirectX-Headers MODULE REQUIRED)
+find_package(DirectX-Guids MODULE)
 
 # ---- Add source files ----
 
