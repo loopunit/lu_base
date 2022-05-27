@@ -94,6 +94,9 @@ endif()
 
 message( STATUS "Building for " ${LU_API_PATH} )
 
+# TODO
+set(LU_GFX_API "DIRECTX12")
+
 #
 
 function(lu_add_executable targetProject targetSources)

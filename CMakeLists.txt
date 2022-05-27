@@ -25,8 +25,24 @@ option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
 include(cmake/CPM.cmake)
 
 find_package(CrossWindow MODULE REQUIRED)
+find_package(CrossWindowGraphics MODULE REQUIRED)
 find_package(DirectX-Headers MODULE REQUIRED)
 find_package(DirectX-Guids MODULE)
+
+CPMAddPackage(
+    NAME imgui
+    GITHUB_REPOSITORY "ocornut/imgui"
+    GIT_TAG "6b5a2426d7a998887cc33f64b147fe1a786d2c8c"
+	DOWNLOAD_ONLY)
+
+if(NOT ${imgui_ADDED})
+  message(
+    FATAL_ERROR
+      "Imgui is required")
+endif()
+
+file(GLOB imgui_headers CONFIGURE_DEPENDS ${imgui_SOURCE_DIR}/*.h)
+file(GLOB imgui_sources CONFIGURE_DEPENDS ${imgui_SOURCE_DIR}/*.cpp)
 
 # ---- Add source files ----
 
@@ -45,7 +61,7 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS
 
 # ---- Target ----
 
-add_library(lu_base ${headers} ${sources})
+add_library(lu_base ${headers} ${sources} ${imgui_headers} ${imgui_sources})
 
 target_compile_options(lu_base INTERFACE "$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 target_compile_options(lu_base INTERFACE "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
@@ -65,17 +81,17 @@ if(LU_PLATFORM_WIN32 OR LU_PLATFORM_UNIVERSAL_WINDOWS)
 		Microsoft::DirectX-Headers
 		Microsoft::DirectX-Guids
 		userenv
-		d3d12 dxcore dxgi
-		CrossWindow)
+		d3d12 dxcore dxgi)
 #		d3dcompiler.lib
 endif()
 
-target_link_libraries(lu_base PUBLIC CrossWindow)
+target_link_libraries(lu_base PUBLIC CrossWindow CrossWindowGraphics)
 
 target_include_directories(lu_base 
 	PUBLIC 
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include/lu_base-0.0.0>
+		$<BUILD_INTERFACE:${imgui_SOURCE_DIR}>
 	PRIVATE
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/memory>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>)
